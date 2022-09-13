@@ -12,12 +12,13 @@ class Bot(models.Model):
 
 class Channel(models.Model):
     bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, default=None, related_name='channels')
-    name = models.CharField(max_length=100, blank=True, default='@default_name')
-    title = models.CharField(max_length=100, blank=True, default='default_title')
+    username_alias = models.JSONField(default=None)
+    title = models.CharField(max_length=100, blank=True, default='default')
     telegram_id = models.IntegerField()
-    external_link = models.CharField(max_length=100, blank=True, default='default_external_link')
-    pin_link = models.CharField(max_length=100, blank=True, default='default_pin_link')
-    direct_link = models.CharField(max_length=100, blank=True, default='default_direct_link')
+    external_link = models.CharField(max_length=100, blank=True, default='default')
+    pin_link = models.CharField(max_length=100, blank=True, default='default')
+    direct_link = models.CharField(max_length=100, blank=True, default='default')
+    
 
     def __str__(self):
         return self.title

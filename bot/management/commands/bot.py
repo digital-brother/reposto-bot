@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+import re
 from django.conf import settings
 import logging
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, filters, MessageHandler
@@ -16,28 +17,35 @@ class Command(BaseCommand):
         channels = []
         for channel in Channel.objects.all():
             channels.append(channel)
-        
-        async def start(update, context):
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
-
 
         async def repost(update, context):
             for channel in channels:
+                print(update)
                 if channel.telegram_id == update.effective_chat.id:
                     pass
                 else:
-                    print(update)
-                    print('==========================')
-                    message = update.channel_post.text
-                    message += '123'
+                    message = update.channel_post.text.replace(channel.username_alias[0], channel.username_alias[1]).replace('Richsignal', 'TEST')
                     await context.bot.send_message(chat_id=channel.telegram_id, text=message)
 
         application = ApplicationBuilder().token(token).build()
-
-        start_handler = CommandHandler('start', start)
         repost_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), repost)
-
-        application.add_handler(start_handler)
         application.add_handler(repost_handler)
-
         application.run_polling()
+
+# maybe this function is good idea, maybe not...
+"""
+        async def repost(update, context):
+            for channel in channels:
+                print(update)
+                if channel.telegram_id == update.effective_chat.id:
+                    pass
+                else:
+                    message = update.channel_post.text
+                    try:
+                        pin_username = re.search("(?<!\w)@\w+", message).group()
+                        if pin_username == "@Vijaysignal":
+                            message = message.replace(pin_username, '@UsernameReplasement')
+                    except AttributeError:
+                        pass
+                    await context.bot.send_message(chat_id=channel.telegram_id, text=message)
+"""
