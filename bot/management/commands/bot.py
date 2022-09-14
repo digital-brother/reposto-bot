@@ -21,14 +21,18 @@ class Command(BaseCommand):
         async def repost(update, context):
             for channel in channels:
                 print(update)
-                if channel.telegram_id == update.effective_chat.id:
-                    pass
-                else:
-                    message = update.channel_post.text.replace(channel.username_alias[0], channel.username_alias[1]).replace('Richsignal', 'TEST')
-                    await context.bot.send_message(chat_id=channel.telegram_id, text=message)
+                if channel.telegram_id != update.effective_chat.id:
+                    # message = update.channel_post.text.replace(
+                    #     channel.username_alias[0], channel.username_alias[1]
+                    #     ).replace(
+                    #         channel.promo_replacement[0], f'<b><a href={channel.external_link}>{channel.promo_replacement[1]}</a></b>'
+                    #         )
+                    await context.bot.copy_message(chat_id=channel.telegram_id, message_id=update.effective_message.id, from_chat_id=channels[0].telegram_id)
+                    # await context.bot.send_message(chat_id=channel.telegram_id, text=message, parse_mode='HTML')
+
 
         application = ApplicationBuilder().token(token).build()
-        repost_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), repost)
+        repost_handler = MessageHandler(filters.ALL, repost)
         application.add_handler(repost_handler)
         application.run_polling()
 
@@ -37,9 +41,7 @@ class Command(BaseCommand):
         async def repost(update, context):
             for channel in channels:
                 print(update)
-                if channel.telegram_id == update.effective_chat.id:
-                    pass
-                else:
+                if channel.telegram_id != update.effective_chat.id:
                     message = update.channel_post.text
                     try:
                         pin_username = re.search("(?<!\w)@\w+", message).group()
