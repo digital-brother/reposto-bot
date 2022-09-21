@@ -20,16 +20,24 @@ class Command(BaseCommand):
 
         async def repost(update, context):
             for channel in channels:
-                if channel.telegram_id != update.effective_chat.id:
-                    print(update)
-                    if update.channel_post.text:
-                        message = update.channel_post.text.replace(channel.username_alias[0], channel.username_alias[1]).replace(channel.promo_replacement[0], channel.promo_replacement[1])
-                        await context.bot.send_message(chat_id=channel.telegram_id, text=message)
-                    elif update.channel_post.caption:
-                        caption = update.channel_post.caption.replace(channel.username_alias[0], channel.username_alias[1])
-                        await context.bot.copy_message(chat_id=channel.telegram_id, message_id=update.effective_message.id, from_chat_id=update.effective_chat.id, caption=caption)
-                    else:
-                        await context.bot.copy_message(chat_id=channel.telegram_id, message_id=update.effective_message.id, from_chat_id=update.effective_chat.id)
+                if channel.telegram_id == update.effective_chat.id:
+                    continue
+
+                print(update)
+
+                if update.channel_post.text:
+                    message = update.channel_post.text.replace(
+                        channel.username_alias[0], channel.username_alias[1]).replace(
+                        channel.promo_replacement[0], channel.promo_replacement[1])
+                    await context.bot.send_message(chat_id=channel.telegram_id, text=message)
+                elif update.channel_post.caption:
+                    caption = update.channel_post.caption.replace(
+                        channel.username_alias[0], channel.username_alias[1])
+                    await context.bot.copy_message(
+                        chat_id=channel.telegram_id, message_id=update.effective_message.id, from_chat_id=update.effective_chat.id, caption=caption)
+                else:
+                    await context.bot.copy_message(
+                        chat_id=channel.telegram_id, message_id=update.effective_message.id, from_chat_id=update.effective_chat.id)
 
 
         application = ApplicationBuilder().token(token).build()
