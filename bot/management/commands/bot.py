@@ -1,3 +1,4 @@
+import telegram
 from django.core.management.base import BaseCommand
 import re
 from django.conf import settings
@@ -25,11 +26,11 @@ class Command(BaseCommand):
 
                 print(update)
 
-                if update.channel_post.text:
-                    message = update.channel_post.text.replace(
+                if update.channel_post.text_markdown_v2:
+                    message = update.channel_post.text_markdown_v2.replace(
                         channel.username_alias[0], channel.username_alias[1]).replace(
                         channel.promo_replacement[0], channel.promo_replacement[1])
-                    await context.bot.send_message(chat_id=channel.telegram_id, text=message)
+                    await context.bot.send_message(chat_id=channel.telegram_id, text=message, parse_mode=telegram.constants.ParseMode.MARKDOWN_V2)
                 elif update.channel_post.caption:
                     caption = update.channel_post.caption.replace(
                         channel.username_alias[0], channel.username_alias[1])
