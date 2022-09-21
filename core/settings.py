@@ -125,4 +125,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Bot settings
-BOT_NAME = 'Reposto'
+# TODO: read from .env file
+BOT_NAME = 'reposter_bot'
