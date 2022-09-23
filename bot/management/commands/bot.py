@@ -23,9 +23,11 @@ class Command(BaseCommand):
         pin_link_regex = "(https://t.me/)"
 
         async def repost(update, context):
-
             for channel in channels:
-                if update.channel_post.text_html:
+                is_text_only = bool(update.channel_post.text_html)
+                is_text_with_image = bool(update.channel_post.caption_html)
+
+                if is_text_only:
                     message = update.channel_post.text_html.replace(
                         channel.username_replacement[0], channel.username_replacement[1]).replace(
                         channel.promocode_replacement[0], channel.promocode_replacement[1])
@@ -44,9 +46,10 @@ class Command(BaseCommand):
                         parse_mode="HTML"
                         )
 
-                elif update.channel_post.caption_html:
+                elif is_text_with_image:
                     caption = update.channel_post.caption_html.replace(
-                        channel.username_replacement[0], channel.username_replacement[1])
+                        channel.username_replacement[0], channel.username_replacement[1]).replace(
+                        channel.promocode_replacement[0], channel.promocode_replacement[1])
                     if re.search(external_link_regex, caption) is not None:
                         if re.search(pin_link_regex, caption):
                             caption = caption.replace(
