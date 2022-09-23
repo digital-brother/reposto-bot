@@ -28,7 +28,14 @@ class Command(BaseCommand):
                 is_text_with_image = bool(update.channel_post.caption_html)
 
                 if is_text_only:
-                    message = update.channel_post.text_html.replace(
+                    work_content = update.channel_post.text_html
+                elif is_text_with_image:
+                    work_content = update.channel_post.caption_html
+                else:
+                    work_content = None
+
+                if is_text_only:
+                    message = work_content.replace(
                         channel.username_replacement[0], channel.username_replacement[1]).replace(
                         channel.promocode_replacement[0], channel.promocode_replacement[1])
                     if re.search(external_link_regex, message) is not None:
@@ -47,7 +54,7 @@ class Command(BaseCommand):
                         )
 
                 elif is_text_with_image:
-                    caption = update.channel_post.caption_html.replace(
+                    caption = work_content.replace(
                         channel.username_replacement[0], channel.username_replacement[1]).replace(
                         channel.promocode_replacement[0], channel.promocode_replacement[1])
                     if re.search(external_link_regex, caption) is not None:
