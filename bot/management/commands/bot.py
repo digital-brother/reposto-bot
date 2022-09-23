@@ -14,7 +14,8 @@ class Command(BaseCommand):
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
             level=logging.INFO
         )
-        token = Bot.objects.get(name=settings.BOT_NAME).token
+        enabled_bots = Bot.objects.filter(enabled=True)
+        token = enabled_bots.get(name=settings.BOT_NAME).token
 
         channels = []
         for channel in Channel.objects.all():
