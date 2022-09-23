@@ -25,9 +25,6 @@ class Command(BaseCommand):
         async def repost(update, context):
 
             for channel in channels:
-                if channel.telegram_id == update.effective_chat.id:
-                    continue
-
                 if update.channel_post.text_html:
                     message = update.channel_post.text_html.replace(
                         channel.username_replacement[0], channel.username_replacement[1]).replace(
