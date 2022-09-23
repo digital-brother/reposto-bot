@@ -19,10 +19,11 @@ class Command(BaseCommand):
         for channel in Channel.objects.all():
             channels.append(channel)
 
-        external_link_regex = "(http(s?)://[a-zA-Z\d]+.[a-zA-Z]+/[a-zA-Z/]+)"
+        external_link_regex = "(http(s?)://[a-zA-Z0-9./=?#-]+)"
         pin_link_regex = "(https://t.me/)"
 
         async def repost(update, context):
+
             for channel in channels:
                 if channel.telegram_id == update.effective_chat.id:
                     continue
@@ -33,23 +34,45 @@ class Command(BaseCommand):
                         channel.promocode[0], channel.promocode[1])
                     if re.search(external_link_regex, message) is not None:
                         if re.search(pin_link_regex, message):
-                            message = message.replace(re.search('(https://t.me/[a-zA-Z\d/]+)', message).group(), channel.pin_message_link)
+                            message = message.replace(
+                                re.search('(https://t.me/[a-zA-Z\d/]+)', message).group(), channel.pin_message_link
+                                )
                         else:
-                            message = message.replace(re.search(external_link_regex, message).group(), channel.external_link)
-                    await context.bot.send_message(chat_id=channel.telegram_id, text=message, parse_mode="HTML")
+                            message = message.replace(
+                                re.search(external_link_regex, message).group(), channel.external_link
+                                )
+                    await context.bot.send_message(
+                        chat_id=channel.telegram_id,
+                        text=message,
+                        parse_mode="HTML"
+                        )
+
                 elif update.channel_post.caption_html:
                     caption = update.channel_post.caption_html.replace(
                         channel.admin[0], channel.admin[1])
                     if re.search(external_link_regex, caption) is not None:
                         if re.search(pin_link_regex, caption):
-                            caption = caption.replace(re.search('(https://t.me/[a-zA-Z\d/]+)', caption).group(), channel.pin_message_link)
+                            caption = caption.replace(
+                                re.search('(https://t.me/[a-zA-Z\d/]+)', caption).group(), channel.pin_message_link
+                                )
                         else:
-                            caption = caption.replace(re.search(external_link_regex, caption).group(), channel.external_link)
+                            caption = caption.replace(
+                                re.search(external_link_regex, caption).group(), channel.external_link
+                                )
                     await context.bot.copy_message(
-                        chat_id=channel.telegram_id, message_id=update.effective_message.id, from_chat_id=update.effective_chat.id, caption=caption, parse_mode="HTML")
+                        chat_id=channel.telegram_id,
+                        message_id=update.effective_message.id,
+                        from_chat_id=update.effective_chat.id,
+                        caption=caption,
+                        parse_mode="HTML"
+                        )
+
                 else:
                     await context.bot.copy_message(
-                        chat_id=channel.telegram_id, message_id=update.effective_message.id, from_chat_id=update.effective_chat.id)
+                        chat_id=channel.telegram_id,
+                        message_id=update.effective_message.id,
+                        from_chat_id=update.effective_chat.id
+                        )
 
         application = ApplicationBuilder().token(token).build()
         repost_handler = MessageHandler(filters.ALL, repost)
