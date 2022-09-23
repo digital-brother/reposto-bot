@@ -17,9 +17,7 @@ class Command(BaseCommand):
         enabled_bots = Bot.objects.filter(enabled=True)
         token = enabled_bots.get(name=settings.BOT_NAME).token
 
-        channels = []
-        for channel in Channel.objects.all():
-            channels.append(channel)
+        channels = list(Channel.objects.all())
 
         external_link_regex = "(http(s?)://[a-zA-Z0-9./=?#-]+)"
         pin_link_regex = "(https://t.me/)"
