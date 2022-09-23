@@ -15,6 +15,7 @@ class Command(BaseCommand):
             level=logging.INFO
         )
         token = Bot.objects.get(name=settings.BOT_NAME).token
+
         channels = []
         for channel in Channel.objects.all():
             channels.append(channel)
