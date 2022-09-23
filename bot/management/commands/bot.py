@@ -30,8 +30,8 @@ class Command(BaseCommand):
 
                 if update.channel_post.text_html:
                     message = update.channel_post.text_html.replace(
-                        channel.admin[0], channel.admin[1]).replace(
-                        channel.promocode[0], channel.promocode[1])
+                        channel.username_replacement[0], channel.username_replacement[1]).replace(
+                        channel.promocode_replacement[0], channel.promocode_replacement[1])
                     if re.search(external_link_regex, message) is not None:
                         if re.search(pin_link_regex, message):
                             message = message.replace(
@@ -49,7 +49,7 @@ class Command(BaseCommand):
 
                 elif update.channel_post.caption_html:
                     caption = update.channel_post.caption_html.replace(
-                        channel.admin[0], channel.admin[1])
+                        channel.username_replacement[0], channel.username_replacement[1])
                     if re.search(external_link_regex, caption) is not None:
                         if re.search(pin_link_regex, caption):
                             caption = caption.replace(
