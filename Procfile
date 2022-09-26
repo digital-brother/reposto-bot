@@ -1,2 +1,5 @@
+from email.mime import application
+
+
 python manage.py migrate
-web: gunicorn django_project.wsgi
+web: gunicorn core.wsgi:application
