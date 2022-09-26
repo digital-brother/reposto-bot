@@ -1,2 +1,2 @@
 python manage.py migrate
-web: gunicorn config.wsgi:application
+web: gunicorn django_project.wsgi
