@@ -32,7 +32,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['reposto-bot.herokuapp.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -132,4 +132,3 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 BOT_NAME = env('BOT_NAME')
-ALLOWED_HOSTS = ['reposto-bot.herokuapp.com', 'localhost', '127.0.0.1'] 
