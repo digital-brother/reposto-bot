@@ -132,3 +132,4 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 BOT_NAME = env('BOT_NAME')
+ALLOWED_HOSTS = ['reposto-bot.herokuapp.com', 'localhost', '127.0.0.1'] 
