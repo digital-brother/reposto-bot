@@ -1,4 +1,5 @@
 db.sqlite3
+static
 __pycache__
 .vscode
 .env
