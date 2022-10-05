@@ -51,7 +51,7 @@ def update_content(channel, work_content):
     external_link_regex = "(http(s?)://[a-zA-Z0-9./=?#-]+)"
     pin_link_regex = "(https://t.me/)"
 
-    content = work_content.copy()
+    content = work_content
     for username_replacement in channel.username_replacement:
         content = work_content.replace(username_replacement[0], username_replacement[1])
 
