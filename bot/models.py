@@ -21,4 +21,4 @@ class Channel(models.Model):
     pin_message_link = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
-        return self.telegram_id
+        return self.title
