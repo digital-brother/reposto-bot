@@ -4,3 +4,5 @@ __pycache__
 .env
 reposto-aws-key.pem
 db.sqlite3
+.idea
+.python-version
