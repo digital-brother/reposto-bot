@@ -32,7 +32,8 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['54.226.63.33', 'reposto-bot.herokuapp.com', 'localhost', '127.0.0.1']
+HOST = env.str('HOST', default=None)
+ALLOWED_HOSTS = ['54.226.63.33', 'localhost', '127.0.0.1', HOST]
 
 
 # Application definition
