@@ -6,11 +6,10 @@ from telegram.ext import ApplicationBuilder, filters, MessageHandler
 
 from bot.models import Bot, Channel
 
-channels = list(Channel.objects.all())
-
 
 async def repost(update, context):
-    for channel in channels:
+    channels = Channel.objects.all()
+    async for channel in channels:
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
 
