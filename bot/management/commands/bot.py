@@ -52,7 +52,7 @@ def update_content(channel, work_content):
 
     content = work_content
     for username_replacement in channel.username_replacements.all():
-        content = work_content.replace(username_replacement.from_text, username_replacement.to_text)
+        content = work_content.replace(f"@{username_replacement.from_text}", f"@{username_replacement.to_text}")
 
     for promocode_replacement in channel.promocode_replacements.all():
             content = content.replace(promocode_replacement.from_text, promocode_replacement.to_text)
