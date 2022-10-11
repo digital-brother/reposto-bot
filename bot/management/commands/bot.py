@@ -51,11 +51,11 @@ def update_content(channel, work_content):
     pin_link_regex = "(https://t.me/)"
 
     content = work_content
-    for username_replacement in channel.username_replacement:
-        content = work_content.replace(username_replacement[0], username_replacement[1])
+    for username_replacement in channel.username_replacements.all():
+        content = work_content.replace(username_replacement.from_text, username_replacement.to_text)
 
-    for promocode_replacement in channel.promocode_replacement:
-            content = content.replace(promocode_replacement[0], promocode_replacement[1])
+    for promocode_replacement in channel.promocode_replacements.all():
+            content = content.replace(promocode_replacement.from_text, promocode_replacement.to_text)
 
     if re.search(external_link_regex, content) is not None:
         if re.search(pin_link_regex, content):
