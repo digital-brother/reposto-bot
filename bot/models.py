@@ -22,14 +22,20 @@ class Channel(models.Model):
         return self.title
 
 
-class ReplacementFieldsMixin:
+class Replacement(models.Model):
     from_text = models.CharField(max_length=128)
     to_text = models.CharField(max_length=128)
 
+    class Meta:
+        abstract = True
 
-class UsernameReplacement(ReplacementFieldsMixin, models.Model):
+    def __str__(self):
+        return f"{self.from_text} - {self.to_text}"
+
+
+class UsernameReplacement(Replacement):
     channel = models.ForeignKey(Channel, related_name='username_replacements', on_delete=models.CASCADE)
 
 
-class PromocodeReplacement(ReplacementFieldsMixin, models.Model):
+class PromocodeReplacement(Replacement):
     channel = models.ForeignKey(Channel, related_name='promocode_replacements', on_delete=models.CASCADE)
