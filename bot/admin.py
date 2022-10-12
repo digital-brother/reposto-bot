@@ -29,7 +29,7 @@ class InputChannelInline(admin.TabularInline):
 class RepostChannelInline(admin.TabularInline):
     model = RepostChannel
     extra = 1
-    max_num = 1
+    fields = ['title', 'telegram_id']
 
 
 class BotAdmin(admin.ModelAdmin):
