@@ -7,8 +7,11 @@ from bot.models import Bot
 
 
 async def repost(update, context):
-    bot = Bot.objects.active()
-    async for channel in bot.output_channels:
+    bot = await Bot.objects.filter(enabled=True).afirst()
+    input_channel_id = update.channel_post.chat_id
+    input_channel = await bot.input_channels.aget(telegram_id=input_channel_id)
+
+    async for channel in input_channel.output_channels.all():
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
 
@@ -20,7 +23,7 @@ async def repost(update, context):
             work_content = None
 
         if is_text_only:
-            content = update_content(channel, work_content)
+            content = await update_content(channel, work_content)
             await context.bot.send_message(
                 chat_id=channel.telegram_id,
                 text=content,
@@ -28,7 +31,7 @@ async def repost(update, context):
             )
 
         elif is_text_with_image:
-            content = update_content(channel, work_content)
+            content = await update_content(channel, work_content)
             await context.bot.copy_message(
                 chat_id=channel.telegram_id,
                 message_id=update.effective_message.id,
@@ -45,15 +48,15 @@ async def repost(update, context):
             )
 
 
-def update_content(channel, work_content):
+async def update_content(channel, work_content):
     external_link_regex = "(http(s?)://[a-zA-Z0-9./=?#-]+)"
     pin_link_regex = "(https://t.me/)"
 
     content = work_content
-    for username_replacement in channel.username_replacements.all():
+    async for username_replacement in channel.username_replacements.all():
         content = work_content.replace(f"@{username_replacement.from_text}", f"@{username_replacement.to_text}")
 
-    for promocode_replacement in channel.promocode_replacements.all():
+    async for promocode_replacement in channel.promocode_replacements.all():
             content = content.replace(promocode_replacement.from_text, promocode_replacement.to_text)
 
     if re.search(external_link_regex, content) is not None:
