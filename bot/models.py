@@ -28,6 +28,25 @@ class Bot(models.Model):
         return self.name
 
 
+class Replacement(models.Model):
+    from_text = models.CharField(max_length=128)
+    to_text = models.CharField(max_length=128)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return f"{self.from_text} - {self.to_text}"
+
+
+class UsernameReplacement(Replacement):
+    channel = models.ForeignKey('RepostChannel', related_name='username_replacements', on_delete=models.CASCADE)
+
+
+class PromocodeReplacement(Replacement):
+    channel = models.ForeignKey('RepostChannel', related_name='promocode_replacements', on_delete=models.CASCADE)
+
+
 class Channel(models.Model):
     telegram_id = models.IntegerField()
 
@@ -47,22 +66,3 @@ class RepostChannel(models.Model):
 
 class InputChannel(models.Model):
     bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, related_name='input_channels')
-
-
-class Replacement(models.Model):
-    from_text = models.CharField(max_length=128)
-    to_text = models.CharField(max_length=128)
-
-    class Meta:
-        abstract = True
-
-    def __str__(self):
-        return f"{self.from_text} - {self.to_text}"
-
-
-class UsernameReplacement(Replacement):
-    channel = models.ForeignKey(RepostChannel, related_name='username_replacements', on_delete=models.CASCADE)
-
-
-class PromocodeReplacement(Replacement):
-    channel = models.ForeignKey(RepostChannel, related_name='promocode_replacements', on_delete=models.CASCADE)
