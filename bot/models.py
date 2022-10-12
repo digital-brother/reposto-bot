@@ -28,16 +28,25 @@ class Bot(models.Model):
         return self.name
 
 
+class Channel(models.Model):
+    telegram_id = models.IntegerField()
+
+    class Meta:
+        abstract = True
+
+
 class RepostChannel(models.Model):
     bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, related_name='repost_channels')
-    telegram_id = models.IntegerField()
-    title = models.CharField(max_length=100)  # Used for convenience in admin
-
+    title = models.CharField(max_length=100)
     external_link = models.CharField(max_length=100, blank=True)
     pin_message_link = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return self.title
+
+
+class InputChannel(models.Model):
+    bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, related_name='input_channels')
 
 
 class Replacement(models.Model):
