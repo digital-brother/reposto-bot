@@ -48,6 +48,7 @@ class PromocodeReplacement(Replacement):
 
 
 class Channel(models.Model):
+    title = models.CharField(max_length=100)
     telegram_id = models.IntegerField()
 
     class Meta:
@@ -59,7 +60,6 @@ class Channel(models.Model):
 
 class RepostChannel(models.Model):
     bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, related_name='repost_channels')
-    title = models.CharField(max_length=100)
     external_link = models.CharField(max_length=100, blank=True)
     pin_message_link = models.CharField(max_length=100, blank=True)
 
