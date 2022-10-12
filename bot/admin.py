@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from bot.models import Bot, Channel, UsernameReplacement, PromocodeReplacement
+from bot.models import Bot, RepostChannel, UsernameReplacement, PromocodeReplacement
 
 
 class UsernameReplacementInline(admin.TabularInline):
@@ -21,6 +21,6 @@ class ChannelAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Bot)
-admin.site.register(Channel, ChannelAdmin)
+admin.site.register(RepostChannel, ChannelAdmin)
 admin.site.register(UsernameReplacement)
 admin.site.register(PromocodeReplacement)

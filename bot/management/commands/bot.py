@@ -8,7 +8,7 @@ from bot.models import Bot
 
 async def repost(update, context):
     bot = Bot.objects.active()
-    async for channel in bot.channels:
+    async for channel in bot.repost_channels:
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
 

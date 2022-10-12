@@ -28,8 +28,8 @@ class Bot(models.Model):
         return self.name
 
 
-class Channel(models.Model):
-    bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, related_name='channels')
+class RepostChannel(models.Model):
+    bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, related_name='repost_channels')
     telegram_id = models.IntegerField()
     title = models.CharField(max_length=100)  # Used for convenience in admin
 
@@ -52,8 +52,8 @@ class Replacement(models.Model):
 
 
 class UsernameReplacement(Replacement):
-    channel = models.ForeignKey(Channel, related_name='username_replacements', on_delete=models.CASCADE)
+    channel = models.ForeignKey(RepostChannel, related_name='username_replacements', on_delete=models.CASCADE)
 
 
 class PromocodeReplacement(Replacement):
-    channel = models.ForeignKey(Channel, related_name='promocode_replacements', on_delete=models.CASCADE)
+    channel = models.ForeignKey(RepostChannel, related_name='promocode_replacements', on_delete=models.CASCADE)
