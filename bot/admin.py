@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from bot.models import Bot, RepostChannel, UsernameReplacement, PromocodeReplacement
+from bot.models import Bot, RepostChannel, UsernameReplacement, PromocodeReplacement, InputChannel
 
 
 class UsernameReplacementInline(admin.TabularInline):
@@ -20,7 +20,24 @@ class ChannelAdmin(admin.ModelAdmin):
     ]
 
 
-admin.site.register(Bot)
+class InputChannelInline(admin.TabularInline):
+    model = InputChannel
+    extra = 1
+    max_num = 1
+
+
+class RepostChannelInline(admin.TabularInline):
+    model = RepostChannel
+    extra = 1
+    max_num = 1
+
+
+class BotAdmin(admin.ModelAdmin):
+    inlines = [
+        InputChannelInline,
+        RepostChannelInline
+    ]
+
+
+admin.site.register(Bot, BotAdmin)
 admin.site.register(RepostChannel, ChannelAdmin)
-admin.site.register(UsernameReplacement)
-admin.site.register(PromocodeReplacement)

@@ -19,9 +19,9 @@ class Bot(models.Model):
 
     def clean(self):
         model = self._meta.model
-        enabled_bots_count = model.objects.enabled().count()
+        enabled_bots_already_exists = model.objects.enabled().count() >= 1
         is_create = not self.pk
-        if is_create and enabled_bots_count >= 1:
+        if is_create and enabled_bots_already_exists:
             raise ValidationError('You already have a bot running. Disable it to enable another.')
 
     def __str__(self):
@@ -58,11 +58,17 @@ class Channel(models.Model):
         return self.title
 
 
-class RepostChannel(models.Model):
+class RepostChannel(Channel):
     bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, related_name='repost_channels')
     external_link = models.CharField(max_length=100, blank=True)
     pin_message_link = models.CharField(max_length=100, blank=True)
 
 
-class InputChannel(models.Model):
+class InputChannel(Channel):
     bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, related_name='input_channels')
+
+    def clean(self):
+        is_create = not self.pk
+        input_channel_already_exists = self.bot.input_channels.count() >= 1
+        if is_create and input_channel_already_exists:
+            raise ValidationError(f'You already have an input channel for {self.bot}. Delete it to create another.')
