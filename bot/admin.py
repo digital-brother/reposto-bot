@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from bot.models import Bot, RepostChannel, UsernameReplacement, PromocodeReplacement, InputChannel
+from bot.models import Bot, OutputChannel, UsernameReplacement, PromocodeReplacement, InputChannel
 
 
 class UsernameReplacementInline(admin.TabularInline):
@@ -14,6 +14,8 @@ class PromocodeReplacementInline(admin.TabularInline):
 
 
 class ChannelAdmin(admin.ModelAdmin):
+    fields = ['title', 'telegram_id', 'bot', 'external_link', 'pin_message_link']
+    readonly_fields = ['title', 'telegram_id', 'bot']
     inlines = [
         UsernameReplacementInline,
         PromocodeReplacementInline
@@ -27,7 +29,7 @@ class InputChannelInline(admin.TabularInline):
 
 
 class RepostChannelInline(admin.TabularInline):
-    model = RepostChannel
+    model = OutputChannel
     extra = 1
     fields = ['title', 'telegram_id']
 
@@ -40,4 +42,4 @@ class BotAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Bot, BotAdmin)
-admin.site.register(RepostChannel, ChannelAdmin)
+admin.site.register(OutputChannel, ChannelAdmin)

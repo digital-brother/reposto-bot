@@ -40,11 +40,11 @@ class Replacement(models.Model):
 
 
 class UsernameReplacement(Replacement):
-    channel = models.ForeignKey('RepostChannel', related_name='username_replacements', on_delete=models.CASCADE)
+    channel = models.ForeignKey('OutputChannel', related_name='username_replacements', on_delete=models.CASCADE)
 
 
 class PromocodeReplacement(Replacement):
-    channel = models.ForeignKey('RepostChannel', related_name='promocode_replacements', on_delete=models.CASCADE)
+    channel = models.ForeignKey('OutputChannel', related_name='promocode_replacements', on_delete=models.CASCADE)
 
 
 class Channel(models.Model):
@@ -58,7 +58,7 @@ class Channel(models.Model):
         return self.title
 
 
-class RepostChannel(Channel):
+class OutputChannel(Channel):
     bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, related_name='repost_channels')
     external_link = models.CharField(max_length=100, blank=True)
     pin_message_link = models.CharField(max_length=100, blank=True)
