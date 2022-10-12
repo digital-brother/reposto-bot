@@ -2,27 +2,18 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 
-class BotManager(models.Manager):
-    def enabled(self):
-        return self.filter(enabled=True)
+class SingleEnabledAllowedMixin:
+    def clean(self):
+        model = self._meta.model
+        enabled_already_exists = model.objects.filter(enabled=True).exclude(pk=self.pk).count() >= 1
+        if enabled_already_exists and self.enabled:
+            raise ValidationError(f'You already have {model._meta.verbose_name} running. Disable it to enable another.')
 
-    def active(self):
-        return self.enabled().first()
 
-
-class Bot(models.Model):
+class Bot(SingleEnabledAllowedMixin, models.Model):
     name = models.CharField(max_length=100)
     enabled = models.BooleanField(default=True)
     token = models.CharField(max_length=100)
-
-    objects = BotManager()
-
-    def clean(self):
-        model = self._meta.model
-        enabled_bots_already_exists = model.objects.enabled().count() >= 1
-        is_create = not self.pk
-        if is_create and enabled_bots_already_exists:
-            raise ValidationError('You already have a bot running. Disable it to enable another.')
 
     def __str__(self):
         return self.name
@@ -59,16 +50,11 @@ class Channel(models.Model):
 
 
 class OutputChannel(Channel):
-    bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, related_name='repost_channels')
+    bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, related_name='output_channels')
     external_link = models.CharField(max_length=100, blank=True)
     pin_message_link = models.CharField(max_length=100, blank=True)
 
 
-class InputChannel(Channel):
+class InputChannel(SingleEnabledAllowedMixin, Channel):
     bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, related_name='input_channels')
-
-    def clean(self):
-        is_create = not self.pk
-        input_channel_already_exists = self.bot.input_channels.count() >= 1
-        if is_create and input_channel_already_exists:
-            raise ValidationError(f'You already have an input channel for {self.bot}. Delete it to create another.')
+    enabled = models.BooleanField(default=False)

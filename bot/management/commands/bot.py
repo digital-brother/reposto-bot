@@ -8,7 +8,7 @@ from bot.models import Bot
 
 async def repost(update, context):
     bot = Bot.objects.active()
-    async for channel in bot.repost_channels:
+    async for channel in bot.output_channels:
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
 
@@ -73,7 +73,7 @@ def run_bot():
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         level=logging.INFO
     )
-    bot = Bot.objects.active()
+    bot = Bot.objects.get(enabled=True)
     application = ApplicationBuilder().token(bot.token).build()
     repost_handler = MessageHandler(filters.ALL, repost)
     application.add_handler(repost_handler)

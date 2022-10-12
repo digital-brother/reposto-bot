@@ -25,7 +25,6 @@ class ChannelAdmin(admin.ModelAdmin):
 class InputChannelInline(admin.TabularInline):
     model = InputChannel
     extra = 1
-    max_num = 1
 
 
 class RepostChannelInline(admin.TabularInline):
