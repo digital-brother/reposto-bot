@@ -1,15 +1,14 @@
 from django.core.management.base import BaseCommand
-from django.conf import settings
 import logging
 import re
 from telegram.ext import ApplicationBuilder, filters, MessageHandler
 
-from bot.models import Bot, Channel
+from bot.models import Bot
 
 
 async def repost(update, context):
-    channels = Channel.objects.all()
-    async for channel in channels:
+    bot = Bot.objects.active()
+    async for channel in bot.channels:
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
 
@@ -74,10 +73,8 @@ def run_bot():
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         level=logging.INFO
     )
-    enabled_bots = Bot.objects.filter(enabled=True)
-    token = enabled_bots.get(name=settings.BOT_NAME).token
-
-    application = ApplicationBuilder().token(token).build()
+    bot = Bot.objects.active()
+    application = ApplicationBuilder().token(bot.token).build()
     repost_handler = MessageHandler(filters.ALL, repost)
     application.add_handler(repost_handler)
     application.run_polling()

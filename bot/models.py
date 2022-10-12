@@ -1,10 +1,28 @@
+from django.core.exceptions import ValidationError
 from django.db import models
+
+
+class BotManager(models.Manager):
+    def enabled(self):
+        return self.filter(enabled=True)
+
+    def active(self):
+        return self.enabled().first()
 
 
 class Bot(models.Model):
     name = models.CharField(max_length=100)
     enabled = models.BooleanField(default=True)
     token = models.CharField(max_length=100)
+
+    objects = BotManager()
+
+    def clean(self):
+        model = self._meta.model
+        enabled_bots_count = model.objects.enabled().count()
+        is_create = not self.pk
+        if is_create and enabled_bots_count >= 1:
+            raise ValidationError('You already have a bot running. Disable it to enable another.')
 
     def __str__(self):
         return self.name
