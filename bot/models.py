@@ -53,15 +53,15 @@ class Channel(models.Model):
     class Meta:
         abstract = True
 
+    def __str__(self):
+        return self.title
+
 
 class RepostChannel(models.Model):
     bot = models.ForeignKey(Bot, on_delete=models.DO_NOTHING, related_name='repost_channels')
     title = models.CharField(max_length=100)
     external_link = models.CharField(max_length=100, blank=True)
     pin_message_link = models.CharField(max_length=100, blank=True)
-
-    def __str__(self):
-        return self.title
 
 
 class InputChannel(models.Model):
