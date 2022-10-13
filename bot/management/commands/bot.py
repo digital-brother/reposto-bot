@@ -1,3 +1,4 @@
+from asgiref.sync import sync_to_async
 from django.core.management.base import BaseCommand
 import logging
 import re
@@ -23,7 +24,7 @@ async def repost(update, context):
             work_content = None
 
         if is_text_only:
-            content = await update_content(channel, work_content)
+            content = await sync_to_async(update_content)(channel, work_content)
             await context.bot.send_message(
                 chat_id=channel.telegram_id,
                 text=content,
@@ -31,7 +32,7 @@ async def repost(update, context):
             )
 
         elif is_text_with_image:
-            content = await update_content(channel, work_content)
+            content = await sync_to_async(update_content)(channel, work_content)
             await context.bot.copy_message(
                 chat_id=channel.telegram_id,
                 message_id=update.effective_message.id,
@@ -48,15 +49,15 @@ async def repost(update, context):
             )
 
 
-async def update_content(channel, work_content):
+def update_content(channel, work_content):
     external_link_regex = "(http(s?)://[a-zA-Z0-9./=?#-]+)"
     pin_link_regex = "(https://t.me/)"
 
     content = work_content
-    async for username_replacement in channel.username_replacements.all():
+    for username_replacement in channel.username_replacements.all():
         content = content.replace(f"@{username_replacement.from_text}", f"@{username_replacement.to_text}")
 
-    async for promocode_replacement in channel.promocode_replacements.all():
+    for promocode_replacement in channel.promocode_replacements.all():
             content = content.replace(promocode_replacement.from_text, promocode_replacement.to_text)
 
     if re.search(external_link_regex, content) is not None:
