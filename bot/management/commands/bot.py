@@ -54,7 +54,7 @@ async def update_content(channel, work_content):
 
     content = work_content
     async for username_replacement in channel.username_replacements.all():
-        content = work_content.replace(f"@{username_replacement.from_text}", f"@{username_replacement.to_text}")
+        content = content.replace(f"@{username_replacement.from_text}", f"@{username_replacement.to_text}")
 
     async for promocode_replacement in channel.promocode_replacements.all():
             content = content.replace(promocode_replacement.from_text, promocode_replacement.to_text)
