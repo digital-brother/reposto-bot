@@ -50,8 +50,8 @@ async def repost(update, context):
 
 
 def update_content(channel, work_content):
-    external_link_regex = "(http(s?)://[a-zA-Z0-9./=?#-]+)"
-    pin_link_regex = "(https://t.me/)"
+    external_link_regex = r"(https?://(?!t.me)[a-zA-Z0-9./=?#-]+)"
+    pin_link_regex = r"(https://t.me/[a-zA-Z\d/]+)"
 
     content = work_content
     for username_replacement in channel.username_replacements.all():
@@ -60,15 +60,14 @@ def update_content(channel, work_content):
     for promocode_replacement in channel.promocode_replacements.all():
             content = content.replace(promocode_replacement.from_text, promocode_replacement.to_text)
 
-    if re.search(external_link_regex, content) is not None:
-        if re.search(pin_link_regex, content):
-            content = content.replace(
-                re.search('(https://t.me/[a-zA-Z\d/]+)', content).group(), channel.pin_message_link
-            )
-        else:
-            content = content.replace(
-                re.search(external_link_regex, content).group(), channel.external_link
-            )
+    pin_links = re.findall(pin_link_regex, content)
+    for pin_link in pin_links:
+        content = content.replace(pin_link, channel.pin_message_link)
+
+    external_links = re.findall(external_link_regex, content)
+    for external_link in external_links:
+        content = content.replace(external_link, channel.external_link)
+
     return content
 
 
