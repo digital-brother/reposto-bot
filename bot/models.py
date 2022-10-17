@@ -10,6 +10,11 @@ class Bot(models.Model):
     def __str__(self):
         return self.name
 
+    def clean(self):
+        enabled_bot_exists = Bot.objects.filter(enabled=True).exclude(pk=self.pk).exists()
+        if enabled_bot_exists and self.enabled:
+            raise ValidationError('Only single bot can be enabled. Disable this or a currently running bot.')
+
 
 class BotChannelBinding(models.Model):
     bot = models.ForeignKey('Bot', related_name='channel_bindings', on_delete=models.PROTECT)
