@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from bot.models import Bot, OutputChannel, UsernameReplacement, PromocodeReplacement, InputChannel
+from bot.models import Bot, OutputChannel, UsernameReplacement, PromocodeReplacement, InputChannel, BotChannelBinding
 
 
 class UsernameReplacementInline(admin.TabularInline):
@@ -13,14 +13,16 @@ class PromocodeReplacementInline(admin.TabularInline):
     extra = 1
 
 
-class OutputChannelAdmin(admin.ModelAdmin):
-    fields = ['title', 'telegram_id', 'external_link', 'pin_message_link']
+class BotChannelBindingAdmin(admin.ModelAdmin):
+    model = BotChannelBinding
     inlines = [
         UsernameReplacementInline,
         PromocodeReplacementInline
     ]
+    list_filter = ['bot']
 
 
 admin.site.register(Bot)
 admin.site.register(InputChannel)
-admin.site.register(OutputChannel, OutputChannelAdmin)
+admin.site.register(OutputChannel)
+admin.site.register(BotChannelBinding, BotChannelBindingAdmin)
