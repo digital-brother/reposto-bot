@@ -20,6 +20,7 @@ class BotChannelBinding(models.Model):
     bot = models.ForeignKey('Bot', related_name='channel_bindings', on_delete=models.PROTECT)
     input_channel = models.ForeignKey('InputChannel', on_delete=models.CASCADE)
     output_channel = models.ForeignKey('OutputChannel', on_delete=models.CASCADE)
+    enabled = models.BooleanField(default=True)
 
     external_link = models.CharField(max_length=100, blank=True)
     pin_message_link = models.CharField(max_length=100, blank=True)
