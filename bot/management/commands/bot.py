@@ -10,9 +10,12 @@ from bot.models import Bot
 async def repost(update, context):
     bot = await Bot.objects.filter(enabled=True).afirst()
     input_channel_id = update.channel_post.chat_id
-    input_channel = await bot.input_channels.aget(telegram_id=input_channel_id)
+    input_channel = await bot.input_channels.afirst(telegram_id=input_channel_id)
+    if not input_channel:
+        # If we have an update from a channel, which is not mentioned in bot input channels in DB, do nothing
+        return
 
-    async for channel in input_channel.output_channels.all():
+    async for channel in bot.output_channels.all():
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
 

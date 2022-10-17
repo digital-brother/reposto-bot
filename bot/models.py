@@ -6,6 +6,7 @@ class Bot(models.Model):
     enabled = models.BooleanField(default=True)
     token = models.CharField(max_length=100)
     input_channels = models.ManyToManyField('InputChannel', related_name='bots', blank=True)
+    output_channels = models.ManyToManyField('OutputChannel', related_name='bots', blank=True)
 
     def __str__(self):
         return self.name
@@ -34,7 +35,7 @@ class Channel(models.Model):
 
 
 class InputChannel(Channel):
-    output_channels = models.ManyToManyField('OutputChannel', related_name='input_channels', blank=True)
+    pass
 
 
 class OutputChannel(Channel):
