@@ -4,19 +4,16 @@ import logging
 import re
 from telegram.ext import ApplicationBuilder, filters, MessageHandler
 
-from bot.models import Bot, BotChannelBinding
+from bot.models import Bot, BotChannelBinding, OutputChannel
 
 
 async def repost(update, context):
     bot = await Bot.objects.filter(enabled=True).afirst()
     input_channel_telegram_id = update.channel_post.chat_id
-    input_channel_binding = await BotChannelBinding.objects.aget(
-        bot=bot, input_channel_id__telegram_id=input_channel_telegram_id)
-    if not input_channel_binding:
-        # If we have an update from a channel, which is not mentioned in bot input channels in DB, do nothing
-        return
+    channel_bindings = BotChannelBinding.objects.filter(
+        bot=bot, input_channel_id__telegram_id=input_channel_telegram_id).select_related('input_channel')
 
-    async for output_channel in input_channel_binding.output_channels.all():
+    async for channel_binding in channel_bindings:
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
 
@@ -27,8 +24,9 @@ async def repost(update, context):
         else:
             work_content = None
 
+        output_channel = await OutputChannel.objects.aget(pk=channel_binding.output_channel_id)
         if is_text_only:
-            content = await sync_to_async(update_content)(input_channel_binding, work_content)
+            content = await sync_to_async(update_content)(channel_binding, work_content)
             await context.bot.send_message(
                 chat_id=output_channel.telegram_id,
                 text=content,
@@ -36,7 +34,7 @@ async def repost(update, context):
             )
 
         elif is_text_with_image:
-            content = await sync_to_async(update_content)(input_channel_binding, work_content)
+            content = await sync_to_async(update_content)(channel_binding, work_content)
             await context.bot.copy_message(
                 chat_id=output_channel.telegram_id,
                 message_id=update.effective_message.id,
