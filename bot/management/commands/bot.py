@@ -4,18 +4,19 @@ import logging
 import re
 from telegram.ext import ApplicationBuilder, filters, MessageHandler
 
-from bot.models import Bot
+from bot.models import Bot, BotChannelBinding
 
 
 async def repost(update, context):
     bot = await Bot.objects.filter(enabled=True).afirst()
-    input_channel_id = update.channel_post.chat_id
-    input_channel = await bot.input_channels.afirst(telegram_id=input_channel_id)
-    if not input_channel:
+    input_channel_telegram_id = update.channel_post.chat_id
+    input_channel_binding = await BotChannelBinding.objects.aget(
+        bot=bot, input_channel_id__telegram_id=input_channel_telegram_id)
+    if not input_channel_binding:
         # If we have an update from a channel, which is not mentioned in bot input channels in DB, do nothing
         return
 
-    async for channel in bot.output_channels.all():
+    async for channel_binding in input_channel_binding.output_channels.all():
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
 
@@ -27,17 +28,17 @@ async def repost(update, context):
             work_content = None
 
         if is_text_only:
-            content = await sync_to_async(update_content)(channel, work_content)
+            content = await sync_to_async(update_content)(channel_binding, work_content)
             await context.bot.send_message(
-                chat_id=channel.telegram_id,
+                chat_id=channel_binding.telegram_id,
                 text=content,
                 parse_mode="HTML"
             )
 
         elif is_text_with_image:
-            content = await sync_to_async(update_content)(channel, work_content)
+            content = await sync_to_async(update_content)(channel_binding, work_content)
             await context.bot.copy_message(
-                chat_id=channel.telegram_id,
+                chat_id=channel_binding.telegram_id,
                 message_id=update.effective_message.id,
                 from_chat_id=update.effective_chat.id,
                 caption=content,
@@ -46,7 +47,7 @@ async def repost(update, context):
 
         else:
             await context.bot.copy_message(
-                chat_id=channel.telegram_id,
+                chat_id=channel_binding.telegram_id,
                 message_id=update.effective_message.id,
                 from_chat_id=update.effective_chat.id
             )
