@@ -26,7 +26,7 @@ class BotChannelBinding(models.Model):
     pin_message_link = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
-        return f"{self.bot} - {self.input_channel}"
+        return f"{self.input_channel}"
 
     def clean(self):
         model = self._meta.model
