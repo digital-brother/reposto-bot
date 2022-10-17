@@ -16,7 +16,7 @@ async def repost(update, context):
         # If we have an update from a channel, which is not mentioned in bot input channels in DB, do nothing
         return
 
-    async for channel_binding in input_channel_binding.output_channels.all():
+    async for output_channel in input_channel_binding.output_channels.all():
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
 
@@ -28,17 +28,17 @@ async def repost(update, context):
             work_content = None
 
         if is_text_only:
-            content = await sync_to_async(update_content)(channel_binding, work_content)
+            content = await sync_to_async(update_content)(input_channel_binding, work_content)
             await context.bot.send_message(
-                chat_id=channel_binding.telegram_id,
+                chat_id=output_channel.telegram_id,
                 text=content,
                 parse_mode="HTML"
             )
 
         elif is_text_with_image:
-            content = await sync_to_async(update_content)(channel_binding, work_content)
+            content = await sync_to_async(update_content)(input_channel_binding, work_content)
             await context.bot.copy_message(
-                chat_id=channel_binding.telegram_id,
+                chat_id=output_channel.telegram_id,
                 message_id=update.effective_message.id,
                 from_chat_id=update.effective_chat.id,
                 caption=content,
@@ -47,7 +47,7 @@ async def repost(update, context):
 
         else:
             await context.bot.copy_message(
-                chat_id=channel_binding.telegram_id,
+                chat_id=output_channel.telegram_id,
                 message_id=update.effective_message.id,
                 from_chat_id=update.effective_chat.id
             )
