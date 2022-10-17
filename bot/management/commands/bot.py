@@ -76,11 +76,15 @@ def run_bot():
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         level=logging.INFO
     )
-    bot = Bot.objects.get(enabled=True)
-    application = ApplicationBuilder().token(bot.token).build()
-    repost_handler = MessageHandler(filters.ALL, repost)
-    application.add_handler(repost_handler)
-    application.run_polling()
+
+    bots = Bot.objects.filter(enabled=True)
+    applications = []
+    for bot in bots:
+        application = ApplicationBuilder().token(bot.token).build()
+        repost_handler = MessageHandler(filters.ALL, repost)
+        application.add_handler(repost_handler)
+        application.run_polling()
+        applications.append(application)
 
 
 class Command(BaseCommand):
