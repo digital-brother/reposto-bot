@@ -11,7 +11,7 @@ async def repost(update, context):
     bot = await Bot.objects.filter(enabled=True).afirst()
     input_channel_telegram_id = update.channel_post.chat_id
     channel_bindings = BotChannelBinding.objects.filter(
-        bot=bot, input_channel_id__telegram_id=input_channel_telegram_id).select_related('input_channel')
+        bot=bot, input_channel_id__telegram_id=input_channel_telegram_id, enabled=True)
 
     async for channel_binding in channel_bindings:
         is_text_only = bool(update.channel_post.text_html)
