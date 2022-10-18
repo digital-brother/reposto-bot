@@ -25,16 +25,11 @@ class BotChannelBinding(models.Model):
     external_link = models.CharField(max_length=100, blank=True)
     pin_message_link = models.CharField(max_length=100, blank=True)
 
+    class Meta:
+        unique_together = ['bot', 'input_channel', 'output_channel']
+
     def __str__(self):
         return f"{self.input_channel} -> {self.output_channel}"
-
-    def clean(self):
-        model = self._meta.model
-        bot_channel_bindings = model.objects.filter(bot=self.bot).exclude(pk=self.pk)
-
-        duplicate_input_channel_bindings = bot_channel_bindings.filter(input_channel=self.input_channel)
-        if duplicate_input_channel_bindings:
-            raise ValidationError("Duplicate input channel binding")
 
 
 class Replacement(models.Model):

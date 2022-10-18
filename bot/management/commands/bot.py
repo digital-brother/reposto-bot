@@ -92,3 +92,7 @@ def run_bot():
 class Command(BaseCommand):
     def handle(self, *args, **options):
         run_bot()
+
+
+# TODO: Add case insensitive replacement for promocode
+# TODO: Handle button repost
