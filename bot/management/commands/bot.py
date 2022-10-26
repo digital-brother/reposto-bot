@@ -17,10 +17,13 @@ async def repost(update, context):
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
 
+
         if is_text_only:
             work_content = update.channel_post.text_html
+            inline_keyboard = update.channel_post.reply_markup
         elif is_text_with_image:
             work_content = update.channel_post.caption_html
+            inline_keyboard = update.channel_post.reply_markup
         else:
             work_content = None
 
@@ -30,7 +33,8 @@ async def repost(update, context):
             await context.bot.send_message(
                 chat_id=output_channel.telegram_id,
                 text=content,
-                parse_mode="HTML"
+                parse_mode="HTML",
+                reply_markup=inline_keyboard
             )
 
         elif is_text_with_image:
@@ -60,7 +64,8 @@ def update_content(channel, work_content):
         content = content.replace(f"@{username_replacement.from_text}", f"@{username_replacement.to_text}")
 
     for promocode_replacement in channel.promocode_replacements.all():
-            content = content.replace(promocode_replacement.from_text, promocode_replacement.to_text)
+            ignorecase_pattern = re.compile(promocode_replacement.from_text, re.IGNORECASE)
+            content = ignorecase_pattern.sub(promocode_replacement.to_text, content)
 
     pin_links = re.findall(pin_link_regex, content)
     for pin_link in pin_links:
