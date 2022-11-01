@@ -2,6 +2,7 @@ from asgiref.sync import sync_to_async
 from django.core.management.base import BaseCommand
 import logging
 import re
+
 from telegram.ext import ApplicationBuilder, filters, MessageHandler
 
 from bot.models import Bot, BotChannelBinding, OutputChannel
@@ -17,7 +18,6 @@ async def repost(update, context):
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
 
-
         if is_text_only:
             work_content = update.channel_post.text_html
             inline_keyboard = update.channel_post.reply_markup
@@ -26,33 +26,53 @@ async def repost(update, context):
             inline_keyboard = update.channel_post.reply_markup
         else:
             work_content = None
+            inline_keyboard = update.channel_post.reply_markup
 
         output_channel = await OutputChannel.objects.aget(pk=channel_binding.output_channel_id)
         if is_text_only:
             content = await sync_to_async(update_content)(channel_binding, work_content)
+            markup = await sync_to_async(update_markup)(channel_binding, inline_keyboard)
             await context.bot.send_message(
                 chat_id=output_channel.telegram_id,
                 text=content,
                 parse_mode="HTML",
-                reply_markup=inline_keyboard
+                reply_markup=markup
             )
 
         elif is_text_with_image:
             content = await sync_to_async(update_content)(channel_binding, work_content)
+            markup = await sync_to_async(update_markup)(channel_binding, inline_keyboard)
             await context.bot.copy_message(
                 chat_id=output_channel.telegram_id,
                 message_id=update.effective_message.id,
                 from_chat_id=update.effective_chat.id,
                 caption=content,
-                parse_mode="HTML"
+                parse_mode="HTML",
+                reply_markup=markup
             )
 
         else:
             await context.bot.copy_message(
                 chat_id=output_channel.telegram_id,
                 message_id=update.effective_message.id,
-                from_chat_id=update.effective_chat.id
+                from_chat_id=update.effective_chat.id,
+                reply_markup=markup
             )
+
+
+def update_markup(channel, inline_keyboard):
+    markup = inline_keyboard
+
+    if markup is not None:
+        for items in markup['inline_keyboard']:
+            for item in items:
+                for username_replacement in channel.username_replacements.all():
+                    if 'Vijaysignal' in item['url']:
+                        item.url = item.url.replace(f"https://t.me/{username_replacement.from_text}", f"https://t.me/{username_replacement.to_text}")
+                    if 'https://2skonkem5mb.com/' in item['url']:
+                        item.url = item.url.replace(item['url'],
+                                                    channel.external_link)
+    return markup
 
 
 def update_content(channel, work_content):
@@ -60,12 +80,13 @@ def update_content(channel, work_content):
     pin_link_regex = r"(https://t.me/[a-zA-Z\d/]+)"
 
     content = work_content
+
     for username_replacement in channel.username_replacements.all():
         content = content.replace(f"@{username_replacement.from_text}", f"@{username_replacement.to_text}")
 
     for promocode_replacement in channel.promocode_replacements.all():
-            ignorecase_pattern = re.compile(promocode_replacement.from_text, re.IGNORECASE)
-            content = ignorecase_pattern.sub(promocode_replacement.to_text, content)
+        ignorecase_pattern = re.compile(promocode_replacement.from_text, re.IGNORECASE)
+        content = ignorecase_pattern.sub(promocode_replacement.to_text, content)
 
     pin_links = re.findall(pin_link_regex, content)
     for pin_link in pin_links:
@@ -97,7 +118,6 @@ def run_bot():
 class Command(BaseCommand):
     def handle(self, *args, **options):
         run_bot()
-
 
 # TODO: Add case insensitive replacement for promocode
 # TODO: Handle button repost
