@@ -2,6 +2,7 @@ from asgiref.sync import sync_to_async
 from django.core.management.base import BaseCommand
 import logging
 import re
+import copy
 
 from telegram.ext import ApplicationBuilder, filters, MessageHandler
 
@@ -17,38 +18,36 @@ async def repost(update, context):
     async for channel_binding in channel_bindings:
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
+        markup = update.channel_post.reply_markup
 
         if is_text_only:
             work_content = update.channel_post.text_html
-            inline_keyboard = update.channel_post.reply_markup
         elif is_text_with_image:
             work_content = update.channel_post.caption_html
-            inline_keyboard = update.channel_post.reply_markup
         else:
             work_content = None
-            inline_keyboard = update.channel_post.reply_markup
 
         output_channel = await OutputChannel.objects.aget(pk=channel_binding.output_channel_id)
         if is_text_only:
             content = await sync_to_async(update_content)(channel_binding, work_content)
-            markup = await sync_to_async(update_markup)(channel_binding, inline_keyboard)
+            updated_markup = await sync_to_async(update_markup)(channel_binding, markup)
             await context.bot.send_message(
                 chat_id=output_channel.telegram_id,
                 text=content,
                 parse_mode="HTML",
-                reply_markup=markup
+                reply_markup=updated_markup
             )
 
         elif is_text_with_image:
             content = await sync_to_async(update_content)(channel_binding, work_content)
-            markup = await sync_to_async(update_markup)(channel_binding, inline_keyboard)
+            updated_markup = await sync_to_async(update_markup)(channel_binding, markup)
             await context.bot.copy_message(
                 chat_id=output_channel.telegram_id,
                 message_id=update.effective_message.id,
                 from_chat_id=update.effective_chat.id,
                 caption=content,
                 parse_mode="HTML",
-                reply_markup=markup
+                reply_markup=updated_markup
             )
 
         else:
@@ -56,22 +55,26 @@ async def repost(update, context):
                 chat_id=output_channel.telegram_id,
                 message_id=update.effective_message.id,
                 from_chat_id=update.effective_chat.id,
-                reply_markup=markup
+                reply_markup=updated_markup
             )
 
 
-def update_markup(channel, inline_keyboard):
-    markup = inline_keyboard
+def update_markup(channel, markup):
+    markup = copy.deepcopy(markup)
+    external_link_regex = r"(https?://(?!t.me)[a-zA-Z0-9./=?#-]+)"
 
-    if markup is not None:
-        for items in markup['inline_keyboard']:
-            for item in items:
+    if not markup:
+        pass
+    else:
+        for inline_keyboard in markup['inline_keyboard']:
+            for item in inline_keyboard:
                 for username_replacement in channel.username_replacements.all():
-                    if 'Vijaysignal' in item['url']:
-                        item.url = item.url.replace(f"https://t.me/{username_replacement.from_text}", f"https://t.me/{username_replacement.to_text}")
-                    if 'https://2skonkem5mb.com/' in item['url']:
-                        item.url = item.url.replace(item['url'],
-                                                    channel.external_link)
+                    item.url = item.url.replace(f"{username_replacement.from_text}",
+                                                f"{username_replacement.to_text}")
+                external_links = re.findall(external_link_regex, item.url)
+                for external_link in external_links:
+                    item.url = item.url.replace(external_link,
+                                                channel.external_link)
     return markup
 
 
