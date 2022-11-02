@@ -64,17 +64,17 @@ def update_markup(channel, markup):
     external_link_regex = r"(https?://(?!t.me)[a-zA-Z0-9./=?#-]+)"
 
     if not markup:
-        pass
-    else:
-        for inline_keyboard in markup['inline_keyboard']:
-            for item in inline_keyboard:
-                for username_replacement in channel.username_replacements.all():
-                    item.url = item.url.replace(f"{username_replacement.from_text}",
-                                                f"{username_replacement.to_text}")
-                external_links = re.findall(external_link_regex, item.url)
-                for external_link in external_links:
-                    item.url = item.url.replace(external_link,
-                                                channel.external_link)
+        return markup
+
+    for inline_keyboard in markup['inline_keyboard']:
+        for item in inline_keyboard:
+            for username_replacement in channel.username_replacements.all():
+                item.url = item.url.replace(f"{username_replacement.from_text}",
+                                            f"{username_replacement.to_text}")
+            external_links = re.findall(external_link_regex, item.url)
+            for external_link in external_links:
+                item.url = item.url.replace(external_link,
+                                            channel.external_link)
     return markup
 
 
