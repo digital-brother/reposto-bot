@@ -55,7 +55,7 @@ async def repost(update, context):
                 chat_id=output_channel.telegram_id,
                 message_id=update.effective_message.id,
                 from_chat_id=update.effective_chat.id,
-                reply_markup=updated_markup
+                reply_markup=markup
             )
 
 
