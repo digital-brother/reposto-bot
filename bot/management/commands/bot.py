@@ -79,7 +79,7 @@ def update_markup(channel, markup):
 
 
 def update_content(channel, work_content):
-    external_link_regex = r"(https?://(?!t.me)[a-zA-Z0-9./=?#-]+)"
+    external_link_regex = r"(https?://(?!t.me)[:/.A-z?<_&\s=>0-9;-]+)"
     pin_link_regex = r"(https://t.me/[a-zA-Z\d/]+)"
 
     content = work_content
@@ -98,7 +98,6 @@ def update_content(channel, work_content):
     external_links = re.findall(external_link_regex, content)
     for external_link in external_links:
         content = content.replace(external_link, channel.external_link)
-
     return content
 
 
