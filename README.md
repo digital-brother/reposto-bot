@@ -1,5 +1,12 @@
 This is guide how to set up a telegram bot
 
+### Overview:
+The project aim is to repost all messages from a Telegram channel to another channels.
+
+Consists of 2 parts:
+- Django - needed to configure bot, save config to DB
+- Management command - runs the bot, reads config from DB
+
 ### Telegram bot creation:
 1. find @BotFather inside Telegram, make sure that it is an official telegram bot it has "✓" near the name
 2. click "start" button
@@ -18,7 +25,7 @@ This project is build with python3.8. To run this project you need:
 
 ### Django admin explanation:
 After you successfully run the server, the first page will be django admin, after login inside it you will see "Bots" and "Channels":
-1. Bots:
+1. Bots:    
     - "Name" of the bot must be the same as "BOT_NAME" inside your ".env" file.
     - "Token" this is your "HTTP API token" of the telegram bot.
 2. Channels:
