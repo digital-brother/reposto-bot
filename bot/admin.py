@@ -23,7 +23,17 @@ class BotChannelBindingAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'enabled']
 
 
+class InputChannelAdmin(admin.ModelAdmin):
+    model = InputChannel
+    list_display = ['__str__', 'telegram_id']
+
+
+class OutputChannelAdmin(admin.ModelAdmin):
+    model = OutputChannel
+    list_display = ['__str__', 'telegram_id']
+
+
 admin.site.register(Bot)
-admin.site.register(InputChannel)
-admin.site.register(OutputChannel)
+admin.site.register(InputChannel, InputChannelAdmin)
+admin.site.register(OutputChannel, OutputChannelAdmin)
 admin.site.register(BotChannelBinding, BotChannelBindingAdmin)
