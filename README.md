@@ -29,12 +29,14 @@ After you successfully run the server, the first page will be django admin, afte
     - "Name" of the bot must be the same as "BOT_NAME" inside your ".env" file.
     - "Token" this is your "HTTP API token" of the telegram bot.
 2. Channels:
-   - "Bot" - this is bot that must work with this channel that you created
-   - "Telegram_id" - this is your channel's id inside telegram, 
+  - "Title" -- used only for better objects naming inside django admin, thats all.
+  - "Telegram_id" - this is your channel's id inside telegram, 
      - forward a message to the @userinfobot, from your channel to repost
      - copy forward_from_chat.id value
+3. Channel bindings:
+   - "Bot" - this is bot that must work with this channel that you created
    - "Username replacement" -- it must be filled in format ["@Exampleusr", "@Secondusr"] , the idea is, if @Exampleusr exist inside text of the message that posted in channel, it will swap with @Secondusr, after message will be reposted to the next channel
    - "Promocode replacement" -- the logic is the same as with username, but it will swap promocode, format for word a bit different ["Promoexample1", "Promoexample2"]
    - "External link" -- this can be any link that NOT a telegram link
    - "Pin message link" -- this is link to telegram's message, this link allways must start with "https://t.me/"
-   - "Title" -- used only for better objects naming inside django admin, thats all.
+   
