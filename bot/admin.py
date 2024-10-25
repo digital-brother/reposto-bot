@@ -20,6 +20,7 @@ class BotChannelBindingAdmin(admin.ModelAdmin):
         PromocodeReplacementInline
     ]
     list_filter = ['bot']
+    list_display = ['__str__', 'enabled']
 
 
 admin.site.register(Bot)
