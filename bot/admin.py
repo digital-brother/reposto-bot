@@ -20,7 +20,7 @@ class BotChannelBindingAdmin(admin.ModelAdmin):
         PromocodeReplacementInline
     ]
     list_filter = ['bot']
-    list_display = ['__str__', 'enabled']
+    list_display = ['id', 'input_channel', 'output_channel', 'bot', 'enabled']
 
 
 class InputChannelAdmin(admin.ModelAdmin):
@@ -33,7 +33,12 @@ class OutputChannelAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'telegram_id']
 
 
-admin.site.register(Bot)
+class BotAdmin(admin.ModelAdmin):
+    model = Bot
+    list_display = ['__str__', 'enabled']
+
+
+admin.site.register(Bot, BotAdmin)
 admin.site.register(InputChannel, InputChannelAdmin)
 admin.site.register(OutputChannel, OutputChannelAdmin)
 admin.site.register(BotChannelBinding, BotChannelBindingAdmin)
