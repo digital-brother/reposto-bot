@@ -1,21 +1,25 @@
-from asgiref.sync import sync_to_async
-from django.core.management.base import BaseCommand
+import copy
 import logging
 import re
-import copy
 
+from asgiref.sync import sync_to_async
+from django.core.management.base import BaseCommand
 from telegram.ext import ApplicationBuilder, filters, MessageHandler
 
 from bot.models import Bot, BotChannelBinding, OutputChannel
+
+logger = logging.getLogger('bot')
 
 
 async def repost(update, context):
     bot = await Bot.objects.filter(enabled=True).afirst()
     input_channel_telegram_id = update.channel_post.chat_id
-    channel_bindings = BotChannelBinding.objects.filter(
-        bot=bot, input_channel_id__telegram_id=input_channel_telegram_id, enabled=True)
+    channel_bindings = (BotChannelBinding.objects
+                        .filter(bot=bot, input_channel_id__telegram_id=input_channel_telegram_id, enabled=True)
+                        .select_related('input_channel'))
 
     async for channel_binding in channel_bindings:
+        logger.info(f"Reposting to '{channel_binding.input_channel.title}'")
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
         markup = update.channel_post.reply_markup
