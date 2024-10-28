@@ -16,10 +16,10 @@ async def repost(update, context):
     input_channel_telegram_id = update.channel_post.chat_id
     channel_bindings = (BotChannelBinding.objects
                         .filter(bot=bot, input_channel_id__telegram_id=input_channel_telegram_id, enabled=True)
-                        .select_related('input_channel'))
+                        .select_related('input_channel', 'output_channel'))
 
     async for channel_binding in channel_bindings:
-        logger.info(f"Reposting to '{channel_binding.input_channel.title}'")
+        logger.info(f"Reposting '{channel_binding.input_channel.title}' -> '{channel_binding.output_channel.title}' ")
         is_text_only = bool(update.channel_post.text_html)
         is_text_with_image = bool(update.channel_post.caption_html)
         markup = update.channel_post.reply_markup
