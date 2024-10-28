@@ -20,7 +20,14 @@ class BotChannelBindingAdmin(admin.ModelAdmin):
         PromocodeReplacementInline
     ]
     list_filter = ['bot']
-    list_display = ['id', 'input_channel', 'output_channel', 'bot', 'enabled']
+    list_display = ['id', 'input_channel', 'output_channel', 'input_channel_id', 'output_channel_id', 'bot',
+                    'enabled']
+
+    def input_channel_id(self, obj):
+        return obj.input_channel.id if obj.input_channel else None
+
+    def output_channel_id(self, obj):
+        return obj.output_channel.id if obj.output_channel else None
 
 
 class InputChannelAdmin(admin.ModelAdmin):
