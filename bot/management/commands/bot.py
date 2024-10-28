@@ -2,7 +2,7 @@ import copy
 import logging
 import re
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import sync_to_async, async_to_sync
 from django.core.management.base import BaseCommand
 from telegram.ext import ApplicationBuilder, filters, MessageHandler
 
@@ -18,6 +18,8 @@ async def repost(update, context):
                         .filter(bot=bot, input_channel_id__telegram_id=input_channel_telegram_id, enabled=True)
                         .select_related('input_channel', 'output_channel'))
 
+    channel_bindings_ids = await sync_to_async(lambda: list(channel_bindings.values_list('id', flat=True)))()
+    logger.info(f'Bindings {channel_bindings_ids}')
     async for channel_binding in channel_bindings:
         logger.info(f"Reposting '{channel_binding.input_channel.title}' -> '{channel_binding.output_channel.title}' ")
         is_text_only = bool(update.channel_post.text_html)
