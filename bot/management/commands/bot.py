@@ -21,48 +21,51 @@ async def repost(update, context):
     channel_bindings_ids = await sync_to_async(lambda: list(channel_bindings.values_list('id', flat=True)))()
     logger.info(f'Bindings {channel_bindings_ids}')
     async for channel_binding in channel_bindings:
-        logger.info(f"Reposting '{channel_binding.input_channel.title}' -> '{channel_binding.output_channel.title}' ")
-        is_text_only = bool(update.channel_post.text_html)
-        is_text_with_image = bool(update.channel_post.caption_html)
-        markup = update.channel_post.reply_markup
+        try:
+            logger.info(f"Reposting '{channel_binding.input_channel.title}' -> '{channel_binding.output_channel.title}' ")
+            is_text_only = bool(update.channel_post.text_html)
+            is_text_with_image = bool(update.channel_post.caption_html)
+            markup = update.channel_post.reply_markup
 
-        if is_text_only:
-            work_content = update.channel_post.text_html
-        elif is_text_with_image:
-            work_content = update.channel_post.caption_html
-        else:
-            work_content = None
+            if is_text_only:
+                work_content = update.channel_post.text_html
+            elif is_text_with_image:
+                work_content = update.channel_post.caption_html
+            else:
+                work_content = None
 
-        output_channel = await OutputChannel.objects.aget(pk=channel_binding.output_channel_id)
-        if is_text_only:
-            content = await sync_to_async(update_content)(channel_binding, work_content)
-            updated_markup = await sync_to_async(update_markup)(channel_binding, markup)
-            await context.bot.send_message(
-                chat_id=output_channel.telegram_id,
-                text=content,
-                parse_mode="HTML",
-                reply_markup=updated_markup
-            )
+            output_channel = await OutputChannel.objects.aget(pk=channel_binding.output_channel_id)
+            if is_text_only:
+                content = await sync_to_async(update_content)(channel_binding, work_content)
+                updated_markup = await sync_to_async(update_markup)(channel_binding, markup)
+                await context.bot.send_message(
+                    chat_id=output_channel.telegram_id,
+                    text=content,
+                    parse_mode="HTML",
+                    reply_markup=updated_markup
+                )
 
-        elif is_text_with_image:
-            content = await sync_to_async(update_content)(channel_binding, work_content)
-            updated_markup = await sync_to_async(update_markup)(channel_binding, markup)
-            await context.bot.copy_message(
-                chat_id=output_channel.telegram_id,
-                message_id=update.effective_message.id,
-                from_chat_id=update.effective_chat.id,
-                caption=content,
-                parse_mode="HTML",
-                reply_markup=updated_markup
-            )
+            elif is_text_with_image:
+                content = await sync_to_async(update_content)(channel_binding, work_content)
+                updated_markup = await sync_to_async(update_markup)(channel_binding, markup)
+                await context.bot.copy_message(
+                    chat_id=output_channel.telegram_id,
+                    message_id=update.effective_message.id,
+                    from_chat_id=update.effective_chat.id,
+                    caption=content,
+                    parse_mode="HTML",
+                    reply_markup=updated_markup
+                )
 
-        else:
-            await context.bot.copy_message(
-                chat_id=output_channel.telegram_id,
-                message_id=update.effective_message.id,
-                from_chat_id=update.effective_chat.id,
-                reply_markup=markup
-            )
+            else:
+                await context.bot.copy_message(
+                    chat_id=output_channel.telegram_id,
+                    message_id=update.effective_message.id,
+                    from_chat_id=update.effective_chat.id,
+                    reply_markup=markup
+                )
+        except Exception as e:
+            logger.error(f"Error processing binding '{channel_binding.id}': {e}")
 
 
 def update_markup(channel, markup):
